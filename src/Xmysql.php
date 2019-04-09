@@ -27,6 +27,14 @@ Class Xmysql
         $this->DB       = new Connection($dsn, $user, $password, $options);
     }
 
+    /**
+     * @param string $sql
+     * @param bool|true $show_explain
+     * @param bool|false $show_status
+     * @param bool|false $show_profiles
+     * @return bool
+     * @throws \Exception
+     */
     public function execute($sql = '', $show_explain = true, $show_status = false, $show_profiles = false)
     {
         if (empty($sql)) {
