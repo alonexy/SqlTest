@@ -2,9 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>View</title>
 </head>
 <body>
-
+    <div>
+        {% for item in lists %}
+            <table border="1">
+                <tr>
+                    {% for ii in item[0] %}
+                    <td>{{ ii }}</td>
+                    {% endfor %}
+                </tr>
+                {% for kv in item[1] %}
+                    <tr>
+                        {% for vv in kv %}
+                        <td> {{ vv }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        <br>
+        {% endfor %}
+    </div>
 </body>
 </html>

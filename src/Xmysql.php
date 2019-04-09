@@ -4,6 +4,7 @@ namespace Alonexy;
 use jc21\CliTable;
 use jc21\CliTableManipulator;
 use Nette\Database\Connection;
+use Twig\Loader\FilesystemLoader;
 
 Class Xmysql
 {
@@ -12,6 +13,7 @@ Class Xmysql
     private $user;
     private $password;
     private $dbname;
+    private $buffers;
 
     public function __construct($host, $user, $password, $dbname, array $options = [
 
@@ -45,22 +47,32 @@ Class Xmysql
             list($keys,$data) = $this->getShowProfiles($sql);
             $this->Dispaly($keys,$data);
         }
+        return $this->run();
     }
     private function Dispaly($keys,$data,$tableColor='green',$HeaderColor='cyan')
     {
+        $this->buffers[] = [$keys,$data,$tableColor,$HeaderColor];
+    }
+    private  function run(){
         if(PHP_SAPI == 'cli'){
-            $table = new CliTable();
-            $table->setTableColor($tableColor);
-            $table->setHeaderColor($HeaderColor);
-            foreach($keys as $val){
-                $table->addField($val, $val, false,'white');
+            foreach($this->buffers as $k => $buffer){
+                $table = new CliTable();
+                $table->setTableColor($buffer[2]);
+                $table->setHeaderColor($buffer[3]);
+                foreach($buffer[0] as $val){
+                    $table->addField($val, $val, false,'white');
+                }
+                $table->injectData($buffer[1]);
+                $table->display();
             }
-            $table->injectData($data);
-            $table->display();
         }else{ //fpm-fcgi
 
-            echo 'Coding';
+            $loader = new FilesystemLoader(__DIR__.'/../tpl');
+            $twig = new \Twig\Environment($loader);
+
+            echo $twig->render('index.html', ['lists' => $this->buffers]);
         }
+       return true;
     }
     private function getExplain($sql)
     {
